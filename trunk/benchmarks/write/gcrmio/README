@@ -1,0 +1,75 @@
+- Modify HDF5_DIR and H5PART_DIR 
+- Run make
+
+Usage: (-r and -s are required!)
+ -a     alignment in bytes (default 1048576)
+ -k     vertical levels (default 25)
+ -o     output path (default 'output')
+ -r     grid resolution
+ -s     subdomain resolution
+ -t     test run without write (default 0)
+ -v     verbosity level (default 1)
+
+This benchmark simulates the I/O phase of David Randall's INCITE19 Global Cloud
+Resolving Model code. Data is stored in a special icosahedral grid data
+structure that requires the following parameters:
+
+Grid resolution (-r)
+--------------------
+!    level_max -> resolution of the grid.  this parameter determines the
+!                 global horizontal grid resoultion.  see TABLE 1.
+!                 the user will change level_max to change the grid resolution.
+!
+!                           ____________________________________
+!                           |              number   resolution |  
+!                           | max_level   of cells     (km)    |  
+!                           | ---------------------------------|
+!                           |     5           10242   250.2    | 
+!                           |     6           40962   125.1    |  
+!                           |     7          163842    62.55   | 
+!                           |     8          655362    31.27   | 
+!                           |     9         2621442    15.64   |
+!                           |    10        10485762     7.82   |
+!                           |    11        41943042     3.91   |
+!                           |    12       167772162     1.95   |
+!                           |    13       671088642     0.977  |
+!                           |    14      2684354562     0.487  |
+!                           |    15     10737418242     0.244  |
+!                 TABLE 1.  |    16     42949672962     0.122  |
+!                           ------------------------------------
+
+Subdomain resolution (-s)
+-------------------------
+!     sbdmn_iota -> determines the global number of subdomain blocks
+!                   that constitute the horizontal domain decomposition
+!                   see TABLE 2.  the user will change this number 
+!                   to set the global number of subdomain blocks.
+!
+!                           _____________________________ 
+!                           |             global number |
+!                           |             of subdomains |
+!                           | sbdmn_iota   (=nsdm_glbl) |
+!                           | --------------------------|
+!                           |      0             10     |
+!                           |      1             40     |
+!                           |      2            160     |
+!                           |      3            640     |
+!                           |      4           2560     |
+!                           |      5          10240     |
+!                           |      6          40960     |
+!                 TABLE 2.  |      7         163840     |
+!                           -----------------------------
+
+Sample run commands:
+
+#1: Only MPI-IO collective and no tuning:
+
+ aprun -n 160 gcrmio -r 10 -s 2 -prs -edge
+ aprun -n 640 gcrmio -r 11 -s 3 -prs -edge
+ aprun -n 2560 gcrmio -r 12 -s 4 -prs -edge
+
+#2: hand-tuning I did on Franklin at NERSC several years ago (MPI-POSIX, alignment, B-tree size adjustment):
+
+ aprun -n 160 gcrmio -r 10 -s 2 -prs -edge -mpiposix -align <stripe size> -chunk -lustre
+ aprun -n 640 gcrmio -r 11 -s 3 -prs -edge -mpiposix -align <stripe size> -chunk -lustre
+ aprun -n 2560 gcrmio -r 12 -s 4 -prs -edge -mpiposix -align <stripe size> -chunk -lustre

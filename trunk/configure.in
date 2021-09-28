@@ -1,0 +1,244 @@
+dnl /**
+dnl *
+dnl *** Copyright Notice ***
+dnl *
+dnl * PIOK - Parallel I/O Kernels, Copyright (c) 2015-2016, 
+dnl * The Regents of the University of California, through Lawrence
+dnl * Berkeley National Laboratory (subject to receipt of any required approvals
+dnl * from the U.S. Dept. of Energy).  All rights reserved.
+dnl  
+dnl * If you have questions about your rights to use or distribute this software,
+dnl * please contact Berkeley Lab's Innovation & Partnerships Office at
+dnl * IPO@lbl.gov.
+dnl  
+dnl * NOTICE.  This Software was developed under funding from the U.S. Department
+dnl * of Energy and the U.S. Government consequently retains certain rights. As
+dnl * such, the U.S. Government has been granted for itself and others acting on
+dnl * its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+dnl * Software to reproduce, distribute copies to the public, prepare derivative
+dnl * works, and perform publicly and display publicly, and to permit other to do
+dnl * so.
+dnl *
+dnl */
+dnl /**
+dnl *
+dnl * Email questions to SByna@LBL.GOV
+dnl * Scientific Data Management Research Group
+dnl * Lawrence Berkeley National Laboratory
+dnl *
+dnl *
+dnl */
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(piok, version-0.1)
+
+dnl ##########################################################
+dnl # make clean before configure if compiled before
+dnl ##########################################################
+VERBOSE=">>"
+AC_ARG_ENABLE(verbose,
+[  --enable-verbose                Print output to the standard output],
+VERBOSE="| tee -a")
+
+AC_ARG_ENABLE(read-benchmark-only,
+[  --enable-read-benchmark-only	      Enable read benchmark only build],
+ac_read=$enableval)
+
+AC_ARG_ENABLE(write-benchmark-only,
+[  --enable-write-benchmark-only      Enable write benchmark only build],
+ac_write=$enableval)
+
+AC_ARG_ENABLE(ardetection,
+[  --enable-ardetection               Enable ar_detection build only],
+ac_ardetection=$enableval)
+
+AC_ARG_ENABLE(ecog,
+[  --enable-ecog                      Enable ecog build only],
+ac_ecog=$enableval)
+
+AC_ARG_ENABLE(msi,
+[  --enable-msi                       Enable msi build only],
+ac_msi=$enableval)
+
+AC_ARG_ENABLE(gcrmio,
+[  --enable-gcrmio                    Enable gcrmio build only],
+ac_gcrmio=$enableval)
+
+AC_ARG_ENABLE(vorpalio,
+[  --enable-vorpalio                  Enable vorpalio build only],
+ac_vorpalio=$enableval)
+
+AC_ARG_ENABLE(vpicio,
+[  --enable-vpicio                    Enable vpicio build only],
+ac_vpicio=$enableval)
+
+Ver_separator ()
+{
+	var1=$1
+	if test ! "$var1" ; then
+		var1=0
+	fi
+	var2=$2
+	if test ! "$var2" ; then
+		var2=0
+	fi
+	var3=$3
+	if test ! "$var3" ; then
+		var3=0
+	fi
+}
+
+Ver_getter ()
+{
+	varget=$1
+	varget=`echo $varget | sed 's/\./ /g'`
+}
+ 
+OUTPUTFILES="./Makefile ./benchmarks/Makefile ./benchmarks/read/Makefile ./benchmarks/write/Makefile ./benchmarks/read/ar_detection/Makefile ./benchmarks/read/ecog/Makefile ./benchmarks/read/msi/Makefile ./benchmarks/write/gcrmio/Makefile ./benchmarks/write/vorpalio/Makefile ./benchmarks/write/vpicio/Makefile ./benchmarks/write/vpicio/vpicio_hdf5/Makefile ./benchmarks/write/vpicio/vpicio_nonuni/Makefile ./benchmarks/write/vpicio/vpicio_uni/Makefile ./benchmarks/write/vpicio/vpicio_uni_md/Makefile"
+BUILDSUBDIRS="benchmarks"
+BUILD_READ_SUBDIRS="ar_detection ecog msi"
+BUILD_WRITE_SUBDIRS="gcrmio vorpalio vpicio"
+DEPENDSUBDIRS="benchmarks"
+INSTALLSUBDIRS="benchmarks"
+HOST=`uname -n`
+MACHINE=`uname -s`
+
+dnl binary directory
+TOP=`pwd`
+AC_PREFIX_DEFAULT(`pwd`)
+dnl prefix=$ac_default_prefix
+if test "x$prefix" = "xNONE"; then
+  prefix=$ac_default_prefix
+  ac_configure_args="$ac_configure_args --prefix $prefix"
+fi
+echo "DEFAULT_PREFIX=$prefix"
+
+my_HDF5_PATH
+my_H5PART_PATH
+my_MPI_PATH
+my_GET_INSTALL
+my_CC_GET_COMPILER
+my_CCC_GET_COMPILER
+my_H5PCC_GET_COMPILER
+my_GCC_GET_COMPILER
+my_GXX_GET_COMPILER
+
+if test "$H5PCC_COMPILER" = "" ; then
+	H5PCC_COMPILER=$HDF5_PATH/bin/h5pcc
+fi
+
+if test "$ac_read" = "yes" ; then
+ 	echo "*** only build read benchmark ***"
+	BUILD_READ="1"
+fi
+if test "$ac_write" = "yes" ; then
+    echo "*** only build write benchmark ***"
+    BUILD_WRITE="1"
+fi
+if test "$ac_ardetection" = "yes" ; then
+    echo "*** only build ar_detection benchmark ***"
+    BUILD_READ_SUBDIRS="ar_detection"
+	BUILD_READ="1"
+fi
+if test "$ac_ecog" = "yes" ; then
+    echo "*** only build ecog benchmark ***"
+    BUILD_READ_SUBDIRS="ecog"
+	BUILD_READ="1"
+fi
+if test "$ac_msi" = "yes" ; then
+    echo "*** only build msi benchmark ***"
+    BUILD_READ_SUBDIRS="msi"
+	BUILD_READ="1"
+fi
+if test "$ac_gcrmio" = "yes" ; then
+    echo "*** only build gcrmio benchmark ***"
+    BUILD_WRITE_SUBDIRS="gcrmio"
+    BUILD_WRITE="1"
+fi
+if test "$ac_vorpalio" = "yes" ; then
+    echo "*** only build vorpalio benchmark ***"
+    BUILD_WRITE_SUBDIRS="vorpalio"
+    BUILD_WRITE="1"
+fi
+if test "$ac_vpicio" = "yes" ; then
+    echo "*** only build vpicio benchmark ***"
+    BUILD_WRITE_SUBDIRS="vpicio"
+    BUILD_WRITE="1"
+fi
+
+dnl ##########################################################
+DEBUG="-g"
+SHARED_FLAG=
+
+dnl ##########################################################
+BIN_DIR=$prefix/bin
+echo prefix = $prefix
+if test ! -d $prefix ; then
+    mkdir $prefix
+fi
+if test ! -d $BIN_DIR ; then
+    mkdir $BIN_DIR
+fi
+dnl ##########################################################
+dnl Substitue
+AC_SUBST(HDF5_PATH)
+AC_SUBST(H5PART_PATH)
+AC_SUBST(MPI_PATH)
+AC_SUBST(INSTALL)
+AC_SUBST(CC_COMPILER)
+AC_SUBST(CCC_COMPILER)
+AC_SUBST(H5PCC_COMPILER)
+AC_SUBST(GCC_COMPILER)
+AC_SUBST(GXX_COMPILER)
+AC_SUBST(TOP)
+
+AC_SUBST(BUILDSUBDIRS)
+AC_SUBST(BUILD_READ_SUBDIRS)
+AC_SUBST(BUILD_WRITE_SUBDIRS)
+AC_SUBST(DEPENDSUBDIRS)
+AC_SUBST(INSTALLSUBDIRS)
+AC_SUBST(CC)
+AC_SUBST(CCC)
+AC_SUBST(H5PCC)
+AC_SUBST(GCC)
+AC_SUBST(GXX)
+AC_SUBST(BUILD_READ)
+AC_SUBST(BUILD_WRITE)
+
+AC_SUBST(DEBUG)
+AC_SUBST(SHARED_FLAG)
+AC_SUBST(BIN_DIR)
+
+dnl Checks for programs.
+AC_PROG_CXX 
+AC_PROG_CC
+AC_PROG_CPP
+dnl AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+dnl Checks for libraries.
+H5PCC=$H5PCC_COMPILER
+CC=$CC_COMPILER
+CCC=$CCC_COMPILER
+GCC=$GCC_COMPILER
+GXX=$GXX_COMPILER
+
+dnl Replace `main' with a function in -lpthread:
+dnl AC_CHECK_LIB(pthread, main, ,
+dnl 	AC_MSG_ERROR([this library is required.]))
+
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(time.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl AC_C_CONST
+dnl AC_C_INLINE
+dnl AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+dnl AC_CHECK_FUNCS(strcat)
+
+AC_OUTPUT($OUTPUTFILES)
+

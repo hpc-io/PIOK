@@ -1,0 +1,139 @@
+# /**
+# *
+# * *** Copyright Notice ***
+# *
+# * PIOK - Parallel I/O Kernels, Copyright (c) 2015-2016, 
+# * The Regents of the University of California, through Lawrence
+# * Berkeley National Laboratory (subject to receipt of any required approvals
+# * from the U.S. Dept. of Energy).  All rights reserved.
+# *  
+# * If you have questions about your rights to use or distribute this software,
+# * please contact Berkeley Lab's Innovation & Partnerships Office at
+# * IPO@lbl.gov.
+# *  
+# * NOTICE.  This Software was developed under funding from the U.S. Department
+# * of Energy and the U.S. Government consequently retains certain rights. As
+# * such, the U.S. Government has been granted for itself and others acting on
+# * its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# * Software to reproduce, distribute copies to the public, prepare derivative
+# * works, and perform publicly and display publicly, and to permit other to do
+# * so.
+# *
+# */
+# *
+# * Email questions to SByna@LBL.GOV
+# * Scientific Data Management Research Group
+# * Lawrence Berkeley National Laboratory
+# *
+# * Fri Mar 25 09:59:39 PDT 2016
+# *
+###################################################################
+# Change the following directory definition as appropriate
+###################################################################
+SHELL	= /bin/sh
+HOST	= `uname -n`
+TAR_OBJ	= piok-src-`date '+%m%d%y%H%M'`.tar
+
+###################################################################
+# C++ compilation definition
+###################################################################
+
+TOP	=	@TOP@
+SRC	= $(TOP)/benchmarks
+BUILDSUBDIRS = @BUILDSUBDIRS@
+DEPENDSUBDIRS = @DEPENDSUBDIRS@
+INSTALLSUBDIRS = @INSTALLSUBDIRS@
+BUILD_READ	= @BUILD_READ@
+BUILD_WRITE	= @BUILD_WRITE@
+
+###################################################################
+# For ALL build for C
+###################################################################
+all::	$(BUILDSUBDIRS)
+	for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" all "in $(TOP)..." ; \
+	$(MAKE) all ) ; \
+	done
+
+###################################################################
+# For ALL build for C++
+###################################################################
+read::	$(BUILDSUBDIRS)
+	for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" read benchmarks all "in $(TOP)..." ; \
+	$(MAKE) all BUILD_READ=1 ) ; \
+	done
+
+write::	$(BUILDSUBDIRS)
+	for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" write benchmarks all "in $(TOP)..." ; \
+	$(MAKE) all BUILD_WRITE=1 ) ; \
+	done
+
+###################################################################
+# clean : removes intermediate files
+# cleanall : removes intermediate files and executables
+###################################################################
+clean:: $(BUILDSUBDIRS)
+	for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" clean "in $(TOP)/$$i..." ; \
+	$(MAKE) clean ) ; \
+	done
+
+cleanall:: $(BUILDSUBDIRS)
+	for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" cleanall "in $(TOP)/$$i..." ; \
+	$(MAKE) cleanall ) ; \
+	done
+
+###################################################################
+# For install
+###################################################################
+install::	$(INSTALLSUBDIRS)
+	for i in $(INSTALLSUBDIRS) ; \
+	do \
+	(cd $$i ; echo "making" install "in $(TOP)/$$i..." ; \
+	${MAKE} install) ; \
+	done
+
+###################################################################
+# to make a gzipped tar file of sources
+###################################################################
+maketar:
+	@ tar cvf $(TAR_OBJ) Makefile* configure* aclocal.m4 Legal.txt license.txt README ./benchmarks
+	@ gzip $(TAR_OBJ)
+	@ chmod 644 $(TAR_OBJ).gz
+
+######################
+depend:	$(DEPENDSUBDIRS)
+	for i in $(DEPENDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo building Makefile "in $$i..." ; \
+	$(MAKE) depend $(BUILDFLAG) ) ; \
+	done
+
+###################################################################
+# to make a Makefile, make -f thisfile Makefile FRC=rebuild
+# for dependency generation, make sure -xM is for CC only
+#                       and use -MM or -M for g++
+###################################################################
+Makefile	: $(FRC)
+	@ \rm -f $@
+	@ \cp Makefile.in $@
+	@ chmod 440 $@
+	@ for i in $(BUILDSUBDIRS) ; \
+	do \
+	(cd $$i ; echo  building Makefile "in $$i..." ; \
+	$(MAKE) -f Makefile.in Makefile FRC=rebuild) ; \
+	done
+
+###################################################################
+# for forceful rebuild
+# automatically generates dependencies of each source files
+###################################################################
+rebuild	:

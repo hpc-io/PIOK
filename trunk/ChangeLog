@@ -1,0 +1,4 @@
+2016-03-28 
+	* mark code as version 0.1 for release
+	* created automake/autoconf for the source code
+

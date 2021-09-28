@@ -1,0 +1,7 @@
+- Modify H5Proot and HDF5root in Makefile depending on where 
+  H5Part and HDF5 libraries are installed.
+
+- Run "make"
+
+- Sample usage on NERSC's Edison system:
+
