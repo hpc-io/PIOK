@@ -1,7 +1,7 @@
+DESCRIPTION
+=============
 PIOK: Parallel I/O Kernels 
-==========================
 Suren Byna and Mark Howison
-
 Contact: SByna@lbl.gov
 
 Parallel I/O is an essential part of many scientific simulation and
@@ -84,38 +84,83 @@ Example for compiling HDF5 1.8.14 and H5Part on Edison:
 CODE STRUCTURE
 ===============
 
-The kernels are arranged in different directories. Currently, we have
-gcrmio, vorpalio, and vpicio directories.
+The kernels are arranged in different sub-directories, in
+<piok_dir>/benchmarks/read and <piok_dir>/benchmarks/write. 
+Currently, we have gcrmio, vorpalio, and vpicio kernels as write benchmarks; and
+msi, ecog, and ardetect kernels as read benchmarks.
 
-In <piok_dir>/gcrmio, we have the code for gcrmio kernel. 
-<piok_dir>/gcrmio/README file has further details on compiling, and sample
-commands to run on NERSC's Edison system.
+In <piok_dir>/benchmarks/write/gcrmio, we have the code for gcrmio kernel. 
+<piok_dir>/benchmarks/write/gcrmio/README file has further details on compiling,
+and sample commands to run on NERSC's Edison system.
 
-In <piok_dir>/vorpalio, we have the code for vorpalio kernel. 
-<piok_dir>/vorpalio/README file has further details on compiling, and
-sample commands to run on NERSC's Edison system.
+In <piok_dir>/benchmarks/write/vorpalio, we have the code for vorpalio kernel. 
+<piok_dir>/benchmarks/write/vorpalio/README file has further details on
+compiling, and sample commands to run on NERSC's Edison system.
 
-In <piok_dir>/vpicio, we have the code for multiple versions of vpicio kernel. 
-	<piok_dir>/vpicio/vpicio_hdf5: Uses HDF5 calls to perform file
+In <piok_dir>/benchmarks/write/vpicio, we have the code for multiple versions of
+vpicio kernel.
+	vpicio_hdf5: Uses HDF5 calls to perform file
 				       writes.
-	<piok_dir>/vpicio/vpicio_uni:  Uses H5Part calls to perform file
+	vpicio_uni:  Uses H5Part calls to perform file
 				       writes, which internally calls HDF5.
 				       _uni refers to each MPI process
 					writing	same number of particles.
-	<piok_dir>/vpicio/vpicio_non_uni:  Uses H5Part calls to perform file
+	vpicio_non_uni:  Uses H5Part calls to perform file
 				       writes, which internally calls HDF5.
 				       _non_uni refers to each MPI process
 					writing	different number of
 					particles. The variance in the
 					number of particles is controlled
 					by VARIABILITY constant.
-	<piok_dir>/vpicio/vpicio_uni_md:  Uses HDF5's multi-dataset write
+	vpicio_uni_md:  Uses HDF5's multi-dataset write
 					functions. Multi-dataset functions
 					allow writing multiple datasets using
-					a single write call. 
+					a single write call. THIS KERNELS NEEDS
+					A VERSION OF HDF5 THAT HAS MULTI-DATASET
+					FUNCTIONS IMPLEMENTED. 
 
 	Compiling and running vpicio kernels are simple. Modify the HDF5
 	and H5Part paths in the corresponding Makefile and run "make". 
-	<piok_dir>/vpicio/README file has further details on compiling, and sample
-	commands to run on NERSC's Edison system.
+	<piok_dir>/benchmarks/write/vpicio/README file has further details on
+	compiling, and sample commands to run on NERSC's Edison system.
+
+===============
+
+Configure options
+
+  --prefix=<PATH>            Specify the installation path
+                   Default is the current directory (.), and 
+                   the executables will be installed in ./bin/.
+                   E.g. when /tmp/mytest is provided, 
+                        the executables will be in /tmp/mytest/bin/.
+
+  --with-hdf5=<PATH>         Specify the HDF5 path
+  --with-h5part=<PATH>       Specify the H5Part path
+  --with-mpi=<PATH>          Specify the MPI path
+                   When MPI path is not provided, building process will use the
+                   system default (e.g. NERSC case).
+  --enable-read-benchmark-only	     Enable read benchmark only build
+                   Only build the read benchmarks 
+                   (i.e. benchmarks/read directory).
+  --enable-write-benchmark-only      Enable write benchmark only build
+                   Only build the write benchmarks 
+                   (i.e. benchmarks/write directory).
+  --enable-ardetection               Enable ar_detection build only
+                   Only build the ar_detection benchmarks 
+                   (i.e. benchmarks/read/ar_detection directory).
+  --enable-ecog                      Enable ecog build only
+                   Only build the ecog benchmarks 
+                   (i.e. benchmarks/read/ecog directory).
+  --enable-msi                       Enable msi build only
+                   Only build the MSI benchmarks 
+                   (i.e. benchmarks/read/msi directory).
+  --enable-gcrmio                    Enable gcrmio build only
+                   Only build the gcrmio benchmarks 
+                   (i.e. benchmarks/write/gcrmio directory).
+  --enable-vorpalio                  Enable vorpalio build only
+                   Only build the vorpalio benchmarks 
+                   (i.e. benchmarks/write/vorpalio directory).
+  --enable-vpicio                    Enable vpicio build only
+                   Only build the vpicio benchmarks 
+                   (i.e. benchmarks/write/vpicio directory).
 
