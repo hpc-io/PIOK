@@ -1,7 +1,7 @@
-DESCRIPTION
-=============
 PIOK: Parallel I/O Kernels 
+=============
 Suren Byna and Mark Howison
+
 Contact: SByna@lbl.gov
 
 Parallel I/O is an essential part of many scientific simulation and
@@ -99,12 +99,11 @@ compiling, and sample commands to run on NERSC's Edison system.
 
 In <piok_dir>/benchmarks/write/vpicio, we have the code for multiple versions of
 vpicio kernel.
-	vpicio_hdf5: Uses HDF5 calls to perform file
-				       writes.
-	vpicio_uni:  Uses H5Part calls to perform file
-				       writes, which internally calls HDF5.
-				       _uni refers to each MPI process
-					writing	same number of particles.
+
+	vpicio_hdf5: Uses HDF5 calls to perform file writes.
+	
+	vpicio_uni:  Uses H5Part calls to perform file writes, which internally calls HDF5.  _uni refers to each MPI process writing same number of particles.
+
 	vpicio_non_uni:  Uses H5Part calls to perform file
 				       writes, which internally calls HDF5.
 				       _non_uni refers to each MPI process
@@ -127,6 +126,7 @@ vpicio kernel.
 ===============
 
 Configure options
+
 
   --prefix=<PATH>            Specify the installation path
                    Default is the current directory (.), and 
