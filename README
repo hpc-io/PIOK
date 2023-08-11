@@ -4,6 +4,17 @@ Suren Byna and Mark Howison
 
 Contact: SByna@lbl.gov
 
+/***************************************************************************
+PIOK is not in active development due to its dependency on H5Part (which is 
+not maintained actively). 
+
+A new benchmark suite, called h5bench, has been developed that uses the HDF5 
+API directly. h5bench adds more I/O patterns, more I/O kernels from various
+HPC applications. 
+Go to: https://h5bench.readthedocs.io
+GitHub: https://github.com/hpc-io/h5bench
+***************************************************************************/
+
 Parallel I/O is an essential part of many scientific simulation and
 analysis codes on high performance computing (HPC) systems, as the codes
 need to store or retrieve data to or from parallel file systems,
